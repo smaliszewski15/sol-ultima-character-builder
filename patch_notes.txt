@@ -1,0 +1,48 @@
+Sol Ultima Character Builder
+
+V 1.0.0 - Builder Launch
+- Functionality to Choose Race, Class, and Background
+- Ability score point buy
+- Character info list with stuff from each type
+- Choose feats and add to list
+- Choose level and add stat points to ability scores
+
+V 1.0.1 - Bug Fixes + Changes
+- Fixed info listing in for classes and background proficiencies
+- Fixed choosing stat points based on level (was able to choose one more than supposed to)
+- Fixed "Infectious Grooze" having the wrong description
+- Fixed layout on various descriptions
+- Changed layout to always be the same size
+- Color of ASI table so it is actually visible
+- Gave the ability to open and close the feat information so it does not take up all that space
+- Changed layout of feat information slightly
+- Added the new races Mozz'Wani, Cruscarrans, and Terrans as choices in the race list
+
+V 1.0.2 - More Bug Fixes + Changes, Visual Update
+- Added display of points used in ability scores
+- You can no longer exceed 20 when changing ability scores
+- Fixed "Mind Meld" description, as well as formatted some more multi-line feats correctly
+- You can no longer choose more than 1 elite feat
+- Updated styling of the ability scores
+- Added the stat bonuses from race, class, background into the ability score table
+- Changed the Font
+- Updated some of the js code
+
+V 1.0.2.1 - Hotfix
+- Changed font weight to be readible
+- Fixed issue with not being able to choose feats after changing race, class, and background
+
+V 1.1.0 - Save your characters!
+- Added ability to import and export your created characters
+
+V 1.2.0 - The Proficiencies Update
+- Added ability to choose proficiencies
+- Autofill proficiencies from class and background
+- Fixed a bug where the arrow on the feats when clicked would choose the feat as well
+
+
+Plan: Add ability to choose proficiencies
+
+Next:
+- Add rolling for health
+- Randomize Character Stuff

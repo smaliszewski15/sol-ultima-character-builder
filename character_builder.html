@@ -1,0 +1,1020 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Sol Ultima Character Builder</title>
+        <script src="./race_file.js"></script>
+        <script src="./class_file.js"></script>
+        <script src="./background_file.js"></script>
+        <script>
+            let globals = {
+                "level": 1,
+                "asi": 0,
+                "feats_choosen": 0,
+                "points_left": 27,
+                "total_points": 27,
+                "elite_choosen": 0,
+            };
+
+            let ability_scores = [
+                "STR",
+                "DEX",
+                "CON",
+                "INT",
+                "WIS",
+                "CHA"
+            ];
+
+            window.onload = () => {
+
+                let raceList = getRacesList();
+                var raceSelect = document.getElementById('races');
+                for (data in raceList["races"]) {
+                    raceSelect.options[raceSelect.options.length] = new Option(raceList["races"][data], raceList["races"][data]);
+                }
+
+                let classList = getClassList();
+                var classSelect = document.getElementById('classes');
+                for (data in classList["classes"]) {
+                    classSelect.options[classSelect.options.length] = new Option(classList["classes"][data], classList["classes"][data]);
+                }
+
+                let backgroundList = getBackgroundList();
+                var backgroundSelect = document.getElementById('backgrounds');
+                for (data in backgroundList["backgrounds"]) {
+                    backgroundSelect.options[backgroundSelect.options.length] = new Option(backgroundList["backgrounds"][data], backgroundList["backgrounds"][data]);
+                }
+            };
+        </script>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+        <link rel="stylesheet" href="styles.css">
+    </head>
+    <body>
+        <h1 style="text-align: center;">Welcome to the Sol Ultima Character Builder V1.2.0! Now you can actually save your characters to edit later!</h1>
+        <div class="row big">
+            <div id="choose" class="column zone">
+                <script>
+                    function openTab(event, tabName) {
+                        var i;
+                        var x = document.getElementsByClassName("tab");
+                        for (i = 0; i < x.length; i++) {
+                            x[i].style.display = "none";
+                        }
+                        document.getElementById(tabName).style.display = "block";
+
+                        x = document.getElementsByClassName("bar-item");
+                        for (i = 0; i < x.length; i++) {
+                            x[i].classList.remove("choosen");
+                        }
+                        event.target.classList.add("choosen");
+                    }
+                </script>
+                <div id="tabs" style="width: 100%; display: flex; overflow-x: hidden;">
+                    <a class="bar-item choosen" onclick="openTab(event, 'abilities')">Ability Score</a>
+                    <a class="bar-item" onclick="openTab(event, 'char')">Feats</a>
+                    <a class="bar-item" onclick="openTab(event, 'profs')">Proficiencies</a>
+                </div>
+                <div class="tab" id="abilities">
+                    <div id="levels">
+                        <script>
+                            function changeLevel(newLevel) {
+                                globals.level = parseInt(newLevel);
+                                globals.asi = 0;
+    
+                                for (var as of ability_scores) {
+                                    ele = document.getElementById("STR_level");
+                                    var str = document.getElementById("STR");
+                                    if (ele.innerHTML > 0) {
+                                        str.innerHTML -= ele.innerHTML;
+                                    }
+                                    ele.innerHTML = 0;
+                                }
+    
+                                var ele = document.getElementById("levels_left");
+                                var left = globals.level - globals.asi - 1;
+                                ele.innerHTML = "Points left: " + left;
+                            }
+                        </script>
+                        <label for="level">Level:</label>
+                        <select name="level" id="level" onChange="changeLevel(this.value);">
+                            <option value="1" selected>1</option>
+                            <option value="2" >2</option>
+                            <option value="3" >3</option>
+                            <option value="4" >4</option>
+                            <option value="5" >5</option>
+                            <option value="6" >6</option>
+                            <option value="7" >7</option>
+                            <option value="8" >8</option>
+                            <option value="9" >9</option>
+                            <option value="10" >10</option>
+                        </select>
+                    </div>
+                    <div id="ability_scores" class="ability_scores">
+                        <script>
+                            function updateLevelStat(id, add) {
+                                var pointsVal = document.getElementById(id + "_level");
+                                var statEle = document.getElementById(id);
+                                var pointVal = parseInt(pointsVal.innerHTML);
+                                var statVal = parseInt(statEle.innerHTML);
+            
+                                if (add > 0) {
+                                    if (globals.asi >= globals.level - 1) {
+                                        return;
+                                    }
+                                    if (statVal >= 20) {
+                                        return;
+                                    }
+                                    statEle.innerHTML = statVal + 1;
+                                    pointsVal.innerHTML = pointVal + 1;
+                                    globals.asi += 1;
+                                } else {
+                                    if (pointVal > 0) {
+                                        statEle.innerHTML = statVal - 1;
+                                        pointsVal.innerHTML = pointVal - 1;
+                                        globals.asi -= 1;
+                                    }
+                                }
+    
+                                var ele = document.getElementById("levels_left");
+                                var left = globals.level - globals.asi - 1;
+                                ele.innerHTML = "Points left: " + left;
+                            }
+            
+                            function updateStat(id, add) {
+                                var pointsVal = document.getElementById(id + "_point");
+                                var pointsEle = document.getElementById(id + "_pts_used")
+                                var statEle = document.getElementById(id);
+                                var pointVal = parseInt(pointsVal.innerHTML);
+                                var points = parseInt(pointsEle.dataset.points);
+                                var statVal = parseInt(statEle.innerHTML);
+            
+                                if (add > 0) {
+                                    if (points >= 9 || statVal >= 20) {
+                                        return;
+                                    }
+                                    if (points >= 5) {
+                                        if (globals.points_left >= 2) {
+                                            pointsEle.dataset.points = points + 2;
+                                            statEle.innerHTML = statVal + 1;
+                                            pointsVal.innerHTML = pointVal + 1;
+                                            globals.points_left -= 2;
+                                        }
+                                    } else {
+                                        if (globals.points_left >= 1) {
+                                            pointsEle.dataset.points = points + 1;
+                                            statEle.innerHTML = statVal + 1;
+                                            pointsVal.innerHTML = pointVal + 1;
+                                            globals.points_left -= 1;
+                                        }
+                                    }
+                                }
+                                else {
+                                    if (points == 0) {
+                                        return;
+                                    }
+                                    if (points > 5) {
+                                        pointsEle.dataset.points = points - 2;
+                                        statEle.innerHTML = statVal - 1;
+                                        pointsVal.innerHTML = pointVal - 1;
+                                        globals.points_left += 2;
+                                    } else {
+                                        pointsEle.dataset.points = points - 1;
+                                        statEle.innerHTML = statVal - 1;
+                                        pointsVal.innerHTML = pointVal - 1;
+                                        globals.points_left += 1;
+                                    }
+                                }
+                                pointsEle.innerHTML = "(" + pointsEle.dataset.points + "pts)";
+                                var ele = document.getElementById("points_left");
+                                ele.innerHTML = "Points left: " + globals.points_left;
+                            }
+                        </script>
+                        <div class="as_header">
+                            <div class="as_head_1">STR</div>
+                            <div class="as_head_1">DEX</div>
+                            <div class="as_head_1">CON</div>
+                            <div class="as_head_1">INT</div>
+                            <div class="as_head_1">WIS</div>
+                            <div class="as_head_1">CHA</div>
+                        </div>
+                        <div class="as_vals">
+                            <div id="STR">8</div>
+                            <div id="DEX">8</div>
+                            <div id="CON">8</div>
+                            <div id="INT">8</div>
+                            <div id="WIS">8</div>
+                            <div id="CHA">8</div>
+                        </div>
+                        <div class="as_head_2">
+                            <span>Point Buys</span>
+                            <span id="points_left">Points left: 27</span>
+                        </div>
+                        <div class="as_header">
+                            <div>
+                                <div id="STR_point" style="font-size: 18px">0</div>
+                                <div id="STR_pts_used" data-points="0" style="font-size: 12px">(0 pts)</div>
+                                <i class="fa fa-plus-circle as_icons" onclick="globals.points_left > 0 ? updateStat('STR',1) : null;"></i>
+                                <i class="fa fa-minus-circle as_icons" onclick="updateStat('STR',-1);"></i>
+                            </div>
+                            <div>
+                                <div id="DEX_point" style="font-size: 18px">0</div>
+                                <div id="DEX_pts_used" data-points="0" style="font-size: 12px">(0 pts)</div>
+                                <i class="fa fa-plus-circle as_icons" onclick="globals.points_left > 0 ? updateStat('DEX',1) : null;"></i>
+                                <i class="fa fa-minus-circle as_icons" onclick="updateStat('DEX',-1);"></i>
+                            </div>
+                            <div>
+                                <div id="CON_point" style="font-size: 18px">0</div>
+                                <div id="CON_pts_used" data-points="0" style="font-size: 12px">(0 pts)</div>
+                                <i class="fa fa-plus-circle as_icons" onclick="globals.points_left > 0 ? updateStat('CON',1) : null;"></i>
+                                <i class="fa fa-minus-circle as_icons" onclick="updateStat('CON',-1);"></i>
+                            </div>
+                            <div>
+                                <div id="INT_point" style="font-size: 18px">0</div>
+                                <div id="INT_pts_used" data-points="0" style="font-size: 12px">(0 pts)</div>
+                                <i class="fa fa-plus-circle as_icons" onclick="globals.points_left > 0 ? updateStat('INT',1) : null;"></i>
+                                <i class="fa fa-minus-circle as_icons" onclick="updateStat('INT',-1);"></i>
+                            </div>
+                            <div>
+                                <div id="WIS_point" style="font-size: 18px">0</div>
+                                <div id="WIS_pts_used" data-points="0" style="font-size: 12px">(0 pts)</div>
+                                <i class="fa fa-plus-circle as_icons" onclick="globals.points_left > 0 ? updateStat('WIS',1) : null;"></i>
+                                <i class="fa fa-minus-circle as_icons" onclick="updateStat('WIS',-1);"></i>
+                            </div>
+                            <div>
+                                <div id="CHA_point" style="font-size: 18px">0</div>
+                                <div id="CHA_pts_used" data-points="0" style="font-size: 12px">(0 pts)</div>
+                                <i class="fa fa-plus-circle as_icons" onclick="globals.points_left > 0 ? updateStat('CHA',1) : null;"></i>
+                                <i class="fa fa-minus-circle as_icons" onclick="updateStat('CHA',-1);"></i>
+                            </div>
+                        </div>
+                        <div class="as_head_2">
+                            <span>Level Points</span>
+                            <span id="levels_left">Points left: 0</span>
+                        </div>
+                        <div class="as_header">
+                            <div>
+                                <div id="STR_level">0</div>
+                                <i class="fa fa-plus-circle as_icons" onclick="updateLevelStat('STR',1);"></i>
+                                <i class="fa fa-minus-circle as_icons" onclick="updateLevelStat('STR',-1);"></i>
+                            </div>
+                            <div>
+                                <div id="DEX_level">0</div>
+                                <i class="fa fa-plus-circle as_icons" onclick="updateLevelStat('DEX',1);"></i>
+                                <i class="fa fa-minus-circle as_icons" onclick="updateLevelStat('DEX',-1);"></i>
+                            </div>
+                            <div>
+                                <div id="CON_level">0</div>
+                                <i class="fa fa-plus-circle as_icons" onclick="updateLevelStat('CON',1);"></i>
+                                <i class="fa fa-minus-circle as_icons" onclick="updateLevelStat('CON',-1);"></i>
+                            </div>
+                            <div>
+                                <div id="INT_level">0</div>
+                                <i class="fa fa-plus-circle as_icons" onclick="updateLevelStat('INT',1);"></i>
+                                <i class="fa fa-minus-circle as_icons" onclick="updateLevelStat('INT',-1);"></i>
+                            </div>
+                            <div>
+                                <div id="WIS_level">0</div>
+                                <i class="fa fa-plus-circle as_icons" onclick="updateLevelStat('WIS',1);"></i>
+                                <i class="fa fa-minus-circle as_icons" onclick="updateLevelStat('WIS',-1);"></i>
+                            </div>
+                            <div>
+                                <div id="CHA_level">0</div>
+                                <i class="fa fa-plus-circle as_icons" onclick="updateLevelStat('CHA',1);"></i>
+                                <i class="fa fa-minus-circle as_icons" onclick="updateLevelStat('CHA',-1);"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id="char" class="row tab" style="display: none;">
+                    <script>
+                        function add_all(value, from) {
+                            if (from == "race") {
+                                add_race_info(value);
+                            } else if (from == "class") {
+                                add_class_info(value);
+                            } else {
+                                add_background_info(value);
+                            }
+                            create_feats(value, from);
+                        }
+
+                        function create_as_stat_bonus(part, stat) {
+                            var bar = document.createElement("div");
+                            bar.setAttribute('class', 'as_header');
+
+                            for (var stats of ability_scores) {
+                                var ele = document.createElement("div");
+                                ele.innerHTML = stat == stats ? 1 : 0;
+                                bar.appendChild(ele);
+                            }
+                            part.appendChild(bar);
+                            part.dataset.stat = stat;
+
+                            var place = document.getElementById("ability_scores");
+                            place.appendChild(part);
+                        }
+
+                        function add_race_info(value) {
+                            var items = getRaceInfo(value);
+
+                            var race_gen_info = document.getElementById("race_general_info");
+
+                            var info = document.createElement("pre");
+                            info.innerHTML = "Race: " + value + "\n";
+                            info.innerHTML += "Size: " + items.Size + "\n";
+                            info.innerHTML += "Speed: ";
+                            var index = 0;
+                            for ([type, speeds] of Object.entries(items.Speed)) {
+                                info.innerHTML += type + ": "+ speeds + "ft.";
+                                index++;
+                                if (index < Object.keys(items.Speed).length) {
+                                    info.innerHTML += ", ";
+                                }
+                            }
+                            info.innerHTML += "\n";
+
+                            race_gen_info.appendChild(info);
+                            var stat = document.getElementById(items["Racial Stat Bonus"]);
+                            stat.innerHTML = parseInt(stat.innerHTML) + 1;
+
+                            var race_stat = document.createElement("div");
+                            race_stat.id = "race_stat_bonus";
+                            var name = document.createElement("div");
+                            name.innerHTML = "Racial Stat Bonus";
+                            name.style = "text-align: left;";
+                            race_stat.appendChild(name);
+                            create_as_stat_bonus(race_stat, items["Racial Stat Bonus"]);
+                        }
+
+                        function add_class_info(value) {
+                            var items = getClassInfo(value);
+
+                            var class_gen_info = document.getElementById("class_general_info");
+
+                            var info = document.createElement("pre");
+                            info.innerHTML = "Class: " + value + "\n";
+                            info.innerHTML += "Hit Die: " + items["Hit Die"] + "\n";
+                            info.innerHTML += "Proficiencies: ";
+                            var index = 0;
+                            for (profs of items.Proficiencies) {
+                                info.innerHTML += profs;
+                                index++;
+                                info.innerHTML += "\n";
+                            }
+                            info.innerHTML += "Saving Throws: ";
+                            index = 0;
+                            for (sav of items["Saving Throws"]) {
+                                info.innerHTML += sav;
+                                index++;
+                                if (index < items["Saving Throws"].length) {
+                                    info.innerHTML += ", ";
+                                }
+                            }
+                            info.innerHTML += "\n";
+
+                            class_gen_info.appendChild(info);
+                            var stat = document.getElementById(items["Class Stat Bonus"]);
+                            stat.innerHTML = parseInt(stat.innerHTML) + 1;
+
+                            class_gen_info.id = "class_general_info";
+
+                            var class_stat = document.createElement("div");
+                            class_stat.id = "class_stat_bonus";
+                            var name = document.createElement("div");
+                            name.innerHTML = "Class Stat Bonus";
+                            name.style = "text-align: left;";
+                            class_stat.appendChild(name);
+                            create_as_stat_bonus(class_stat, items["Class Stat Bonus"]);
+                        }
+
+                        function add_background_info(value) {
+                            var items = getBackgroundInfo(value);
+
+                            var background_gen_info = document.getElementById("background_general_info");
+
+                            var info = document.createElement("pre");
+                            info.innerHTML = "Background: " + value + "\n";
+                            info.innerHTML += "Contact: " + items.Contact + "\n";
+
+                            background_gen_info.appendChild(info);
+                            var stat = document.getElementById(items["Background Stat Bonus"]);
+                            stat.innerHTML = parseInt(stat.innerHTML) + 1;
+
+                            background_gen_info.id = "background_general_info";
+
+                            var background_stat = document.createElement("div");
+                            background_stat.id = "background_stat_bonus";
+                            var name = document.createElement("div");
+                            name.innerHTML = "Background Stat Bonus";
+                            name.style = "text-align: left;";
+                            background_stat.appendChild(name);
+                            create_as_stat_bonus(background_stat, items["Background Stat Bonus"]);
+                        }
+
+                        function create_feats(value, type) {
+                            if (type == "race") {
+                                var items = getRaceInfo(value);
+                            } else if (type == "class") {
+                                var items = getClassInfo(value);
+                            } else {
+                                var items = getBackgroundInfo(value);
+                            }
+
+                            var feats = document.createElement("div");
+                            feats.id = type + "_feats";
+            
+                            for (index in items.Feats) {
+                                var key = Object.keys(items.Feats[index]);
+                                var name = items.Feats[index][key[0]];
+                                var info = items.Feats[index][key[1]];
+                                
+                                var toAdd = document.createElement("div");
+                                toAdd.style = "padding: 5px; width: 100%";
+                                var featNum = type + 'feat' + index;
+                                toAdd.id = featNum;
+                                toAdd.dataset.type = type;
+                                if (index == 0) {
+                                    toAdd.dataset.free = true;
+                                }
+                                var flexed = document.createElement("div");
+
+                                var wholeName = document.createElement("div");
+                                wholeName.style = "margin-bottom: 10px; display: flex;";
+
+                                var namePart = document.createElement("span");
+                                namePart.innerHTML = "<b>" + name + ":</b>";
+                                namePart.style = "flex-grow: 1;";
+                                wholeName.appendChild(namePart);
+
+                                var iconPart = document.createElement("div");
+                                iconPart.classList.add("icons");
+                                iconPart.innerHTML = index != 0 ? "<i class='fa fa-angle-down'></i>" : "<i class='fa fa-angle-up'></i>";
+                                var iconFeatNum = 'icon' + featNum;
+                                iconPart.id = iconFeatNum;
+                                iconPart.onclick = function(event) {
+                                    hide(this.id);
+                                    event.stopPropagation();
+                                };
+
+                                var featPart = document.createElement("div");
+                                featPart.style.display = index != 0 ? "none" : "block";
+                                featPart.innerHTML = info;
+
+                                wholeName.appendChild(iconPart);
+                                flexed.appendChild(wholeName);
+                                toAdd.appendChild(flexed);
+                                toAdd.appendChild(featPart);
+
+                                toAdd.classList.add("feat");
+                                toAdd.onclick = index != 0 ? function() {
+                                    choose_feat(this.id);
+                                } : null;
+                                feats.appendChild(toAdd);
+
+                                if (index == 0) {
+                                    var featList = document.getElementById("feats_choosen");
+                                    var clone = toAdd.cloneNode(true);
+                                    clone.removeAttribute('id');
+                                    clone.classList.add("feat");
+                                    clone.classList.add(featNum);
+                                    var icon = clone.getElementsByClassName("icons")[0];
+                                    icon.remove();
+                                    var featInfo = clone.childNodes[1];
+                                    featInfo.style.display = "block";
+                                    featList.appendChild(clone);
+
+                                    toAdd.classList.add("selected");
+                                    continue;
+                                }
+                            }
+                            
+                            if (type == "class") {
+                                var title = document.createElement("div");
+                                title.innerHTML = "Elite Feats";
+                                feats.appendChild(title);
+                                for (index in items["Elite Feats"]) {
+                                    var key = Object.keys(items["Elite Feats"][index]);
+                                    var name = items["Elite Feats"][index][key[0]];
+                                    var info = items["Elite Feats"][index][key[1]];
+                                    
+                                    var toAdd = document.createElement("div");
+                                    toAdd.style = "padding: 5px; width: 100%";
+                                    var featNum = type + 'feat' + parseInt(index) + 6;
+                                    toAdd.id = featNum;
+                                    toAdd.dataset.type = type;
+                                    toAdd.dataset.elite = true;
+
+                                    var flexed = document.createElement("div");
+
+                                    var wholeName = document.createElement("div");
+                                    wholeName.style = "margin-bottom: 10px; display: flex;";
+
+                                    var namePart = document.createElement("span");
+                                    namePart.innerHTML = "<b>" + name + ":</b>";
+                                    namePart.style = "flex-grow: 1;";
+                                    wholeName.appendChild(namePart);
+
+                                    var iconPart = document.createElement("div");
+                                    iconPart.classList.add("icons");
+                                    iconPart.innerHTML = "<i class='fa fa-angle-down'></i>";
+                                    var iconFeatNum = 'icon' + featNum;
+                                    iconPart.id = iconFeatNum;
+                                    iconPart.onclick = function(event) {
+                                        hide(this.id);
+                                        event.stopPropagation();
+                                    };
+
+                                    var featPart = document.createElement("div");
+                                    featPart.style.display = "none";
+                                    featPart.innerHTML = info;
+
+                                    wholeName.appendChild(iconPart);
+                                    flexed.appendChild(wholeName);
+                                    toAdd.appendChild(flexed);
+                                    toAdd.appendChild(featPart);
+
+                                    toAdd.classList.add("feat");
+                                    toAdd.onclick = function() {
+                                        choose_feat(this.id, true);
+                                    };
+                                    feats.appendChild(toAdd);
+                                }
+                            }
+                            
+                            var column = document.getElementById(type);
+                            column.appendChild(feats);
+                        }
+
+                        function choose_feat(featID, elite = false) {
+                            var feat = document.getElementById(featID);
+                            if (feat.classList.contains("selected")) {
+                                if (elite) {
+                                    globals.elite_choosen = 0;
+                                }
+                                feat.classList.remove("selected");
+
+                                var featList = document.getElementById("feats_choosen");
+                                featList.getElementsByClassName(feat.id)[0].remove();
+
+                                globals.feats_choosen -= 1;
+                                return;
+                            }
+                            if (globals.feats_choosen >= globals.level) {
+                                return;
+                            }
+
+                            if (elite) {
+                                if (globals.level < 5 || globals.elite_choosen > 0) {
+                                    return;
+                                }
+                                
+                                globals.elite_choosen = 1;
+                            }
+
+                            var featList = document.getElementById("feats_choosen");
+                            var clone = feat.cloneNode(true);
+                            clone.removeAttribute('id');
+                            clone.classList.add("feat");
+                            clone.classList.add(feat.id);
+                            var icon = clone.getElementsByClassName("icons")[0];
+                            icon.remove();
+                            var featInfo = clone.childNodes[1];
+                            featInfo.style.display = "block";
+                            featList.appendChild(clone);
+
+                            feat.classList.add("selected");
+                            
+                            globals.feats_choosen += 1;
+                        }
+
+                        function hide(iconID) {
+                            var icon = document.getElementById(iconID);
+                            var parent = icon.parentElement;
+                            while (!parent.classList.contains("feat")) {
+                                parent = parent.parentElement;
+                            }
+                            var featInfo = parent.childNodes[1];
+                            
+                            if (featInfo.style.display == "none") {
+                                featInfo.style.display = "block";
+                                icon.innerHTML = "<i class='fa fa-angle-up'></i>";
+                            } else {
+                                featInfo.style.display = "none";
+                                icon.innerHTML = "<i class='fa fa-angle-down'></i>";
+                            }
+                        }
+
+                        function changeFeetPool(value, from) {
+                            if (from == "race") {
+                                var oldItems = document.getElementById("race_feats");
+                            } else if (from == "class") {
+                                var oldItems = document.getElementById("class_feats");
+                            } else {
+                                var oldItems = document.getElementById("background_feats");
+                            }
+                            
+                            if (oldItems !== null) {
+                                remove_info(from);
+                                oldItems.remove();
+                            }
+    
+                            if (value == "Select") {
+                                return;
+                            }
+
+                            add_all(value, from);
+                        }
+
+                        function remove_info(type) {
+                            var stat = document.getElementById(type + "_stat_bonus");
+                            var statVal = stat.dataset.stat;
+                            var eleStat = document.getElementById(statVal);
+                            eleStat.innerHTML -= 1;
+                            stat.remove();
+
+                            var info = document.getElementById(type + "_general_info");
+                            info.childNodes[0].remove();
+
+                            var featsChoosen = document.getElementById("feats_choosen");
+                            var feats = featsChoosen.querySelectorAll(`[data-type=${type}]`);
+                            for (var ele of feats) {
+                                if (ele.dataset.elite) {
+                                    globals.elite_choosen = 0;
+                                }
+                                if (!ele.dataset.free) {
+                                    globals.feats_choosen -= 1;
+                                }
+                                ele.remove();
+                            }
+                        }
+
+                        function add_proficiencies(newBack) {
+                            var whole_list = document.getElementsByClassName("prof_list");
+                            for (var prof of whole_list) {
+                                if (prof.classList.contains("dis")) {
+                                    prof.classList.remove("dis");
+                                    prof = prof.childNodes[0];
+                                    prof.disabled = false;
+                                }
+                            }
+
+                            var toChoose = document.createElement("div");
+                            var profs = newBack.Proficiencies;
+                            for (var each of profs) {
+                                if (typeof each === 'string' || each instanceof String) {
+                                    var ele = document.getElementById(each);
+                                    if (ele != null) {
+                                        ele.checked = true;
+                                        ele.disabled = true;
+                                        ele = ele.parentNode;
+                                        ele.classList += "dis " + "checked";
+                                        continue;
+                                    }
+                                    ele = document.getElementById("Extras");
+                                    ele.innerHTML = ele.innerHTML + each + ', ';
+                                    ele.style.display = "block";
+                                    continue;
+                                }
+                                if (Object.keys(each)[0] == "choice") {
+
+                                }
+                                if (Object.keys(each)[0] == "extra") {
+                                    var choice = document.getElementById("prof_choice");
+                                    choice.dataset.totalchoices = each["extra"];
+                                    choice.innerHTML = 'Choices Left: ' + '<i>' + each["extra"] + '</i>';
+                                }
+                            }
+                        }
+                    </script>
+                    <div class="column" id="race">
+                        <label for="races">Races:</label>
+                        <select name="races" id="races" onChange="changeFeetPool(this.value, 'race');">
+                            <option value="Select" selected>Select a race</option>
+                        </select>
+                    </div>
+                    <div class="column" id="class">
+                        <label for="classes">Classes:</label>
+                        <select name="classes" id="classes" onChange="changeFeetPool(this.value, 'class');">
+                            <option value="Select" selected>Select a Class</option>
+                        </select>
+                    </div>
+                    <div class="column" id="background">
+                        <label for="backgrounds">Backgrounds:</label>
+                        <select name="backgrounds" id="backgrounds" onChange="changeFeetPool(this.value, 'background');">
+                            <option value="Select" selected>Select a Background</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="tab" id="profs" style="display: none">
+                    <div id="prof_choice" style="font-size: 24px; width: 100%; margin: 5px;" data-totalchoices=0 data-choices=0>Finished choosing</div>
+                    <div style="font-size: 24px; width: 100%; border-bottom: 1px solid white; text-align: left;">Skills</div>
+                    <div style="display:flex;">
+                        <div style="width: 50%" id="skill_list_1">
+                            <div class="prof_list dis">
+                                <input type="checkbox" id="acrobatics" name="acrobatics" value="Acrobatics" onchange="" disabled>
+                                <label for="acrobatics">Acrobatics</label>
+                            </div>
+                            <div class="prof_list dis">
+                                <input type="checkbox" id="animal_handling" name="animal_handling" value="Animal Handling" disabled>
+                                <label for="animal_handling">Animal Handling</label>
+                            </div>
+                            <div class="prof_list dis">
+                                <input type="checkbox" id="athletics" name="athletics" value="Athletics" disabled>
+                                <label for="athletics">Athletics</label>
+                            </div>
+                            <div class="prof_list dis">
+                                <input type="checkbox" id="deception" name="deception" value="Deception" disabled>
+                                <label for="deception">Deception</label>
+                            </div>
+                            <div class="prof_list dis">
+                                <input type="checkbox" id="history" name="history" value="History" disabled>
+                                <label for="history">History</label>
+                            </div>
+                            <div class="prof_list dis">
+                                <input type="checkbox" id="insight" name="insight" value="Insight" disabled>
+                                <label for="insight">Insight</label>
+                            </div>
+                            <div class="prof_list dis">
+                                <input type="checkbox" id="intimidation" name="intimidation" value="Intimidation" disabled>
+                                <label for="intimidation">Intimidation</label>
+                            </div>
+                            <div class="prof_list dis">
+                                <input type="checkbox" id="investigation" name="investigation" value="Investigation" disabled>
+                                <label for="investigation">Investigation</label>
+                            </div>
+                            <div class="prof_list dis">
+                                <input type="checkbox" id="medicine" name="medicine" value="Medicine" disabled>
+                                <label for="medicine">Medicine</label>
+                            </div>
+                        </div>
+                        <div style="width: 50%;" id="skill_list_2">
+                            <div class="prof_list dis">
+                                <input type="checkbox" id="perception" name="perception" value="Perception" disabled>
+                                <label for="perception">Perception</label>
+                            </div>
+                            <div class="prof_list dis">
+                                <input type="checkbox" id="performance" name="performance" value="Performance" disabled>
+                                <label for="performance">Performance</label>
+                            </div>
+                            <div class="prof_list dis">
+                                <input type="checkbox" id="persuasion" name="persuasion" value="Persuasion" disabled>
+                                <label for="persuasion">Persuasion</label>
+                            </div>
+                            <div class="prof_list dis">
+                                <input type="checkbox" id="religion" name="religion" value="Religion" disabled>
+                                <label for="religion">Religion</label>
+                            </div>
+                            <div class="prof_list dis">
+                                <input type="checkbox" id="science" name="science" value="Science" disabled>
+                                <label for="science">Science</label>
+                            </div>
+                            <div class="prof_list dis">
+                                <input type="checkbox" id="sleight_of_hand" name="sleight_of_hand" value="Sleight of Hand" disabled>
+                                <label for="sleight_of_hand">Sleight of Hand</label>
+                            </div>
+                            <div class="prof_list dis">
+                                <input type="checkbox" id="stealth" name="stealth" value="Stealth" disabled>
+                                <label for="stealth">Stealth</label>
+                            </div>
+                            <div class="prof_list dis">
+                                <input type="checkbox" id="survival" name="survival" value="Survival" disabled>
+                                <label for="survival">Survival</label>
+                            </div>
+                            <div class="prof_list dis">
+                                <input type="checkbox" id="technology" name="technology" value="Technology" disabled>
+                                <label for="technology">Technology</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="font-size: 24px; width: 100%; border-bottom: 1px solid white; text-align: left;">Tools</div>
+                    <div style="display:flex;">
+                        <div style="width: 50%" id="tool_list_1">
+                            <div class="prof_list dis">
+                                <input type="checkbox" id="armorers" name="armorers" value="Armorers" disabled>
+                                <label for="armorers">Armorer</label>
+                            </div>
+                            <div class="prof_list dis">
+                                <input type="checkbox" id="weaponsmithing" name="weaponsmithing" value="Weaponsmithing" disabled>
+                                <label for="weaponsmithing">Weaponsmithing</label>
+                            </div>
+                            <div class="prof_list dis">
+                                <input type="checkbox" id="scavenger" name="scavenger" value="Scavenger" disabled>
+                                <label for="scavenger">Scavenger</label>
+                            </div>
+                            <div class="prof_list dis">
+                                <input type="checkbox" id="musical" name="musical" value="Musical" disabled>
+                                <label for="musical">Musical Instrument</label>
+                            </div>
+                            <div class="prof_list dis">
+                                <input type="checkbox" id="splicer" name="splicer" value="Splicer" disabled>
+                                <label for="splicer">Splicer</label>
+                            </div>
+                            <div class="prof_list dis">
+                                <input type="checkbox" id="thieves" name="thieves" value="Thieves" disabled>
+                                <label for="thieves">Thieves</label>
+                            </div>
+                            <div class="prof_list dis">
+                                <input type="checkbox" id="disguise" name="disguise" value="Disguise" disabled>
+                                <label for="disguise">Disguise Kit</label>
+                            </div>
+                        </div>
+                        <div style="width: 50%" id="tool_list_2">
+                            <div class="prof_list dis">
+                                <input type="checkbox" id="bureaucracy" name="bureaucracy" value="Bureaucracy" disabled>
+                                <label for="bureaucracy">Bureaucracy Supplies</label>
+                            </div>
+                            <div class="prof_list dis">
+                                <input type="checkbox" id="agri" name="agri" value="Agri" disabled>
+                                <label for="agri">Agri Kit</label>
+                            </div>
+                            <div class="prof_list dis">
+                                <input type="checkbox" id="chemist" name="chemist" value="Chemist" disabled>
+                                <label for="chemist">Chemist</label>
+                            </div>
+                            <div class="prof_list dis">
+                                <input type="checkbox" id="chef" name="chef" value="Chef" disabled>
+                                <label for="chef">Chef’s Utensils</label>
+                            </div>
+                            <div class="prof_list dis">
+                                <input type="checkbox" id="mechanical" name="mechanical" value="Mechanical" disabled>
+                                <label for="mechanical">Mechanical</label>
+                            </div>
+                            <div class="prof_list dis">
+                                <input type="checkbox" id="stoneworker" name="stoneworker" value="Stoneworker" disabled>
+                                <label for="stoneworker">Stoneworker</label>
+                            </div>
+                            <div class="prof_list dis">
+                                <input type="checkbox" id="demolitions" name="demolitions" value="Demolitions" disabled>
+                                <label for="demolitions">Demolitions</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="Extras" style="display: none;"></div>
+                </div>
+                <script>
+
+                    function change_total_choices(event) {
+                        var same_profs = document.getElementByName(event.target.name);
+                        if (same_profs.length > 1) {
+                            for (var each in same_profs) {
+                                if (each == event.target) {
+                                    continue;
+                                }
+                                each.disabled = true;
+                                each.checked = true;
+                                each = each.parent;
+                                each.classList += "dis " + "checked";
+                            }
+                        }
+                        if (event.target.checked) {
+                            var all_profs = document.getElementById("prof_choice");
+                            
+                            all_profs.dataset.choices += 1;
+                            if (all_profs.dataset.totalchoices == all_profs.dataset.choices) {
+
+                            }
+                        }
+                    }
+
+                </script>
+            </div>
+            <div id="information" class="column">
+                <script>
+                    function upload() {
+                        var file = document.getElementById('import').files[0];
+                        
+                        if (file) {
+                            new Response(file).json().then(json => {
+                                //First do the ability scores, then the global variables, then the race, class, and background (if applicable), then feats
+                                document.getElementById("level").value = json.level;
+                                changeLevel(json.level);
+                                globals.asi = json.lp_used;
+                                globals.points_left = json.points_left;
+                                for (var as of json.as) {
+                                    var ability = Object.keys(as)[0];
+                                    var pbps = document.getElementById(ability + "_pts_used");
+                                    var lps = document.getElementById(ability + "_level");
+                                    var pbs = document.getElementById(ability + "_point");
+                                    var abs = document.getElementById(ability);
+
+                                    pbps.innerHTML = "(" + as[ability].pbp + " pts)";
+                                    pbps.dataset.points = as[ability].pbp;
+
+                                    if (as[ability].pbp == 9) {
+                                        pbs.innerHTML = 7;
+                                    } else if (as[ability].pbp == 7) {
+                                        pbs.innerHTML = 6;
+                                    } else {
+                                        pbs.innerHTML = as[ability].pbp;
+                                    }
+                                    lps.innerHTML = as[ability].lp;
+
+                                    abs.innerHTML = parseInt(abs.innerHTML) + parseInt(pbs.innerHTML) + parseInt(lps.innerHTML);
+                                }
+
+                                document.getElementById("points_left").innerHTML = "Points left: " + globals.points_left;
+                                var asi = globals.level - globals.asi - 1;
+                                document.getElementById("levels_left").innerHTML = "Points left: " + asi;
+
+                                if ("race" in json) {
+                                    document.getElementById("races").value = json.race;
+                                } else {
+                                    document.getElementById("races").value = "Select";
+                                }
+                                changeFeetPool(json.race, 'race');
+
+                                if ("class" in json) {
+                                    document.getElementById("classes").value = json.class;
+                                } else {
+                                    document.getElementById("classes").value = "Select";
+                                }
+                                changeFeetPool(json.class, 'class');
+
+                                if ("background" in json) {
+                                    document.getElementById("backgrounds").value = json.background;
+                                } else {
+                                    document.getElementById("backgrounds").value = "Select";
+                                }
+                                changeFeetPool(json.background, 'background');
+
+                                for (var feat of json.feats) {
+                                    choose_feat(feat, feat[feat.length - 1] > 5);
+                                }
+                                
+                            }, err => {
+                                console.log(err);
+                            });
+                        }
+                    }
+
+                    function download(filename) {
+                        var toDownload = document.createElement('a');
+                        
+                        var obj = {};
+
+                        var grab = document.getElementById("general_info");
+                        for (var ele of grab.childNodes) {
+                            var type = ele.dataset.type;
+                            obj[type] = ele.dataset.name;
+                        }
+                        obj.level = globals.level;
+                        obj.lp_used = globals.asi;
+                        obj.points_left = globals.points_left;
+                        obj.elite_choosen = globals.elite_choosen;
+                        obj.feats_choosen = globals.feats_choosen;
+
+                        var as = [];
+
+                        for (var ability of ability_scores) {
+                            var pbps = document.getElementById(ability + "_pts_used");
+                            var lps = document.getElementById(ability + "_level");
+                            var newObj = {
+                                [ability]: {
+                                    "pbp": parseInt(pbps.dataset.points),
+                                    "lp": parseInt(lps.innerHTML)
+                                }
+                            };
+                            as.push(newObj);
+                        }
+
+                        obj.as = as;
+
+                        grab = document.getElementById("feats_choosen");
+                        var feats = [];
+                        for (var feat of grab.childNodes) {
+                            if (feat.id[feat.id.length - 1] != 0) {
+                                feats.push(feat.id);
+                            }
+                        }
+                        obj.feats = feats;
+
+                        toDownload.href = URL.createObjectURL(new Blob([JSON.stringify(obj, null, 4)], {
+                            type: "application/json"
+                        }));
+                        toDownload.setAttribute('download', filename + ".json");
+                        toDownload.setAttribute('rel', "noopener noreferrer");
+                        toDownload.onclick = "window.open(this.href, '_blank');return false;";
+                      
+                        toDownload.style.display = 'none';
+                        document.body.appendChild(toDownload);
+                        toDownload.click();
+                        document.body.removeChild(toDownload);
+                      }
+                </script>
+                <div class="row big">
+                    <input type="file" id="import" name="import" accept="application/json" onchange="upload();" style="opacity:0; position: absolute; z-index: -1;">
+                    <label for="import" class="button">Import Character</label>
+                    <form onsubmit="download(this['name'].value);" style="display: flex; margin: 5px;">
+                        <input type="text" name="name" value="character">
+                        <input type="submit" value="Download">
+                    </form>
+                </div>
+                <div id="general_info">
+                    <div id="race_general_info" class="extras"></div>
+                    <div id="class_general_info" class="extras"></div>
+                    <div id="background_general_info" class="extras"></div>
+                </div>
+                <div id="feats_choosen"></div>
+            </div>
+        </div>
+    </body>
+</html>

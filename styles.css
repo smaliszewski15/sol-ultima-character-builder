@@ -1,0 +1,146 @@
+body {
+    text-align: center;
+    background-color: rgb(45, 51, 61);
+    color: white;
+    width: 100%;
+    margin: 0px;
+}
+
+.ability_scores {
+    margin: 5px;
+    padding: 5px;
+    border: 4px solid white;
+    border-radius: 10px;
+    font-weight: 500px;
+}
+
+.as_header {
+    margin: 10px;
+    display: flex;
+    justify-content: space-around;
+    text-align: center;
+}
+
+.as_head_1 {
+    text-align: center;
+    font-size: 20px;
+}
+
+.as_head_2 {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 18px;
+}
+
+.as_vals {
+    margin: 10px;
+    display: flex;
+    justify-content: space-around;
+}
+
+.as_icons {
+    color: orange;
+    border-radius: 50%;
+}
+
+.bar-item {
+    padding: 8px 16px;
+    float: left;
+    width: auto;
+    display: block;
+    cursor: pointer;
+}
+
+.bar-item:hover {
+    background-color: lightgrey;
+}
+
+.bar-item.choosen {
+    border-bottom: 1px solid orange;
+}
+
+.button {
+    background: white;
+    color: black;
+    padding: 5px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.column {
+    float: left;
+    width: 30%;
+    margin: 10px;
+}
+
+.column.zone {
+    width: 800px;
+    min-width: 800px;
+}
+
+.row:after {
+    overflow-x: auto;
+    content: "";
+    display: flex;
+    clear: both;
+}
+
+.row.big {
+    display: flex;
+}
+
+.extras {
+    width: 100%;
+    justify-content: flex-start;
+    color: white;
+    padding: 5px;
+    text-align: left;
+    font-size: 20px;
+}
+
+.icons {
+    float: right;
+    border-style: solid;
+    border-width: 1px;
+    border-radius: 40%;
+    border-color: black;
+    -moz-border-radius:50%;
+    -webkit-border-radius:50%;
+    width: 20px;
+    height: 20px;
+    text-align: center;
+}
+
+.feat {
+    white-space: pre-wrap;
+    float: left;
+    text-align: left;
+    border: 1px solid black;
+    background-color: white;
+    color: black;
+    margin: 10px 0px;
+}
+
+.feat.selected {
+    background-color: rgb(255, 253, 128);
+    color: black;
+}
+
+.prof_list {
+    font-size: 20px;
+    border: 1px solid white;
+    padding: 5px;
+    margin: 5px;
+    border-radius: 10px;
+    text-align: left;
+}
+
+.prof_list.dis {
+    border-color: lightgrey;
+    color: lightgrey;
+}
+
+.prof_list.checked {
+    border-width: 4px;
+}
